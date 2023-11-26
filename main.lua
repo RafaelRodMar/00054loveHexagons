@@ -41,13 +41,18 @@ function love.mousepressed(x,y,button, istouch)
 
         if vSect.y % 2 == 0 then sectTyp = 'A' else sectTyp = 'B' end
 
-        local m = math.floor(h / r)
+        local m = h / r   -- gradients of the edges
+        local m2 = -h / r
         if sectTyp == 'A' then
+            -- A-Sections consist of three areas.
+            -- If the pixel position in question lies within the big bottom area the array coordinate of the tile is the same as the coordinate of our section.
+            -- If the position lies within the top left edge we have to subtract one from the horizontal (x) and the vertical (y) component of our section coordinate.
+            -- If the position lies within the top right edge we reduce only the vertical component.
             --middle
             vClicked.x = vSect.x
             vClicked.y = vSect.y
             --left edge
-            if vSectPxl.y < (h - vSectPxl.x * m) then
+            if vSectPxl.y < (h + vSectPxl.x * m2) then
                 vClicked.x = vSect.x - 1
                 vClicked.y = vSect.y - 1
             end
@@ -57,6 +62,10 @@ function love.mousepressed(x,y,button, istouch)
                 vClicked.y = vSect.y - 1
             end
         else
+            -- B-Sections consist of three areas, too. But they are shaped differently!
+            -- If the pixel position in question lies within the right area the array coordinate of the tile is the same as the coordinate of our section.
+            -- If the position lies within the left area we have to subtract one from the horizontal (x) component of our section coordinate.
+            -- If the position lies within the top area we have to subtract one from the vertical (y) component.
             --right side
             if vSectPxl.x >= r then
                 if vSectPxl.y < (2 * h - vSectPxl.x * m) then
@@ -105,6 +114,24 @@ function love.draw()
             local pixelY = y * (h + s)
             love.graphics.draw(hexagon, pixelX, pixelY)
         end
+    end
+
+    -- show selected hexagon
+    if vClicked.x >= 0 and vClicked.y >= 0 and vClicked.x < 20 and vClicked.y < 15 then
+        love.graphics.setColor(1,0,0)
+        local sx = vClicked.x + 1
+        local sy = vClicked.y + 1
+        local pixelX
+
+        if sy % 2 == 0 then
+            pixelX = sx * 2 * r + r - 32
+        else
+            pixelX = sx * 2 * r - 32
+        end 
+
+        local pixelY = sy * (h + s)
+        love.graphics.draw(hexagon, pixelX, pixelY)
+        love.graphics.setColor(1,1,1)
     end
 
 
